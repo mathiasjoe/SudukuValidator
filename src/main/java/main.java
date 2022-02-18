@@ -27,14 +27,14 @@ public class main {
                 for (int col2 = col + 1; col2 < 9; col2++)
                     if (s[row][col] == s[row][col2]) {
                         rowCheck = false;
-                        break;
+                        System.out.println("Sudoku bord not valid. Error in: " + " row " + (row+1) + " in column " + (col+1) + " and " + (col2+1) +" as they are containing the same number, number: " + s[row][col]);
                     }
 
     }
 
 
     /**
-     * Column checker.
+     * Column checker. Checks if the columns of the sudoku bord is valid or not
      *
      * @param s the sudoku puzzle
      */
@@ -44,27 +44,31 @@ public class main {
         for (int col = 0; col < 9; col++)
             for (int row = 0; row < 8; row++)
                 for (int row2 = row + 1; row2 < 9; row2++)
-                    if (s[row][col] == s[row2][col])
+                    if (s[row][col] == s[row2][col]) {
                         columnChecker = false;
+                        System.out.println("Sudoku bord not valid. Error in: " + " column " + (col+1) + " in row " + (row+1) + " and " + (row2+1) +" as they are containing the same number, number: " + s[row][col]);
+                    }
     }
 
 
     /**
-     * Grid checker.
+     * Grid checker. Checks if the grids of the sudoku bord is valid or not
      *
      * @param s the sudoku puzzle
      */
-// grid checker
     public static void gridChecker(int[][] s) {
         gridCheck = true;
+        int gridNumber = 0;
         for (int row = 0; row < 9; row += 3) {
             for (int col = 0; col < 9; col += 3) {
+                gridNumber +=1;
                 // row, col is start of the 3 by 3 grid
                 for (int pos = 0; pos < 8; pos++) {
                     for (int pos2 = pos + 1; pos2 < 9; pos2++) {
                         if (s[row + pos % 3][col + pos / 3] == s[row + pos2 % 3][col + pos2 / 3]) {
                             gridCheck = false;
-                            break;
+                            System.out.println("Sudoku bord not valid. Error in grid: " + gridNumber );
+                            //todo return the string and print it out in a 4th thred. can be multiple strings string with new line
                         }
                     }
                 }
@@ -74,10 +78,10 @@ public class main {
 
 
     /**
-     * Scanner int [ ] [ ].
+     * Scanner int [ ] [ ]. Reads the csv file and returns an array of type int
      *
      * @param filePath the file path
-     * @return the int [ ] [ ]
+     * @return the int [ ] [ ] containing the sudoku bord
      * @throws FileNotFoundException the file not found exception
      */
     public static int[][] scanner(String filePath) throws FileNotFoundException {
@@ -92,8 +96,6 @@ public class main {
             }
             u++;
         }
-        System.out.println(Arrays.deepToString(sudoku));
-
         return sudoku;
     }
 
@@ -108,51 +110,42 @@ public class main {
         String path = "src/main/resources/sudoku.csv";
 
         Thread thread = new Thread(() -> {
+
+            //todo user input path
             try {
                 s = scanner(path);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
+
+
+
+
         });
 
 
         Thread t1 = new Thread(new Runnable() {
-
             @Override
             public void run() {
-
                 gridChecker(s);
-                if (!gridCheck) {
-                    System.out.println("Error in grid check");
-                }
             }
-
         });
 
         Thread t2 = new Thread(new Runnable() {
             @Override
             public void run() {
-
-
                 columnChecker(s);
-                if (!columnChecker) {
-                    System.out.println("Error in column check");
-                }
             }
-
         });
-
 
         Thread t3 = new Thread(new Runnable() {
             @Override
             public void run() {
-
                 rowChecker(s);
-                if (!rowCheck) {
-                    System.out.println("Error in row check");
-                }
             }
         });
+
+        thread.start();
         thread.join();
         t1.start();
         t2.start();
@@ -161,13 +154,13 @@ public class main {
         t2.join();
         t3.join();
 
-        System.out.println(rowCheck + "row");
-        System.out.println(columnChecker + "column");
-        System.out.println(gridCheck + "grid");
+//        System.out.println(rowCheck + "row");
+//        System.out.println(columnChecker + "column");
+//        System.out.println(gridCheck + "grid");
         if (rowCheck && columnChecker && gridCheck) {
-            System.out.println("valid babe<3");
+            System.out.println("valid");
         } else {
-            System.out.println("Invalid bitch </3");
+            System.out.println("Invalid");
         }
     }
 }
